@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Findr — Modern Lost & Found Hub</title>
+    <meta name="description" content="A simple, modern, and responsive Lost & Found platform to report, track, and reunite lost possessions with their rightful owners.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ==================== TOP NAVIGATION BAR ==================== -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand" onclick="resetFiltersAndScrollTop()">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <path d="M11 8v6M8 11h6"></path>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Findr</span>
+                    <span class="brand-tagline">Lost & Found Hub</span>
+                </div>
+            </div>
+
+            <!-- Database Engine Status Badge -->
+            <div class="db-status-pill" id="dbStatusPill" onclick="openDbModal()" title="Click to view Database settings & info">
+                <span class="db-dot"></span>
+                <span class="db-label" id="dbStatusLabel">DB: Loading...</span>
+            </div>
+
+            <!-- Top Actions -->
+            <div class="nav-actions">
+                <button class="btn btn-secondary-nav" onclick="openReportModal('lost')">
+                    <span class="btn-dot dot-red"></span>
+                    Report Lost
+                </button>
+                <button class="btn btn-primary-nav" onclick="openReportModal('found')">
+                    <span class="btn-dot dot-green"></span>
+                    Report Found
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-content">
+
+        <!-- HERO SECTION & STATS -->
+        <section class="hero-section">
+            <div class="hero-text-wrap">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Community Reconnection Portal
+                </div>
+                <h1 class="hero-title">Reuniting People with Their <span class="gradient-text">Lost Possessions</span></h1>
+                <p class="hero-subtitle">
+                    Quickly report lost items or register items you've found. Search our live directory to connect with owners safely and fast.
+                </p>
+                <div class="hero-cta-group">
+                    <button class="btn btn-hero btn-lost" onclick="openReportModal('lost')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        I Lost Something
+                    </button>
+                    <button class="btn btn-hero btn-found" onclick="openReportModal('found')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        I Found Something
+                    </button>
+                </div>
+            </div>
+
+            <!-- DASHBOARD METRIC STAT CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="filterByType('all')">
+                    <div class="stat-icon-box stat-total">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statTotal">0</span>
+                        <span class="stat-title">Total Reports</span>
+                    </div>
+                </div>
+
+                <div class="stat-card" onclick="filterByType('lost')">
+                    <div class="stat-icon-box stat-lost">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statLost">0</span>
+                        <span class="stat-title">Lost Items</span>
+                    </div>
+                </div>
+
+                <div class="stat-card" onclick="filterByType('found')">
+                    <div class="stat-icon-box stat-found">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statFound">0</span>
+                        <span class="stat-title">Found Items</span>
+                    </div>
+                </div>
+
+                <div class="stat-card" onclick="filterByType('claimed')">
+                    <div class="stat-icon-box stat-reunited">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statReunited">0</span>
+                        <span class="stat-title">Reunited / Claimed</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== FILTER & SEARCH TOOLBAR ==================== -->
+        <section class="controls-section" id="itemsSection">
+            <div class="controls-container">
+
+                <!-- Search Input with icon -->
+                <div class="search-box">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search by item name, location, or description..." autocomplete="off">
+                    <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()" style="display: none;" title="Clear search">✕</button>
+                </div>
+
+                <!-- Type Segment Buttons -->
+                <div class="type-filter-group">
+                    <button class="type-pill active" data-type="all" onclick="filterByType('all')">All Items</button>
+                    <button class="type-pill" data-type="lost" onclick="filterByType('lost')">
+                        <span class="dot dot-red"></span> Lost
+                    </button>
+                    <button class="type-pill" data-type="found" onclick="filterByType('found')">
+                        <span class="dot dot-green"></span> Found
+                    </button>
+                    <button class="type-pill" data-type="claimed" onclick="filterByType('claimed')">
+                        <span class="dot dot-purple"></span> Reunited
+                    </button>
+                </div>
+
+                <!-- Right Toolbar: Category Dropdown & Sort -->
+                <div class="dropdowns-group">
+                    <div class="select-wrapper">
+                        <label for="categoryFilter" class="sr-only">Category</label>
+                        <select id="categoryFilter" onchange="onCategoryChange()">
+                            <option value="all">📂 All Categories</option>
+                            <option value="Electronics">📱 Electronics</option>
+                            <option value="Wallets & Bags">👛 Wallets & Bags</option>
+                            <option value="Keys & Cards">🔑 Keys & Cards</option>
+                            <option value="Documents">📄 Documents & IDs</option>
+                            <option value="Pets">🐶 Pets & Animals</option>
+                            <option value="Clothing">👕 Clothing & Shoes</option>
+                            <option value="Jewelry">💍 Jewelry & Watches</option>
+                            <option value="Other">📦 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="select-wrapper">
+                        <label for="sortFilter" class="sr-only">Sort by</label>
+                        <select id="sortFilter" onchange="onSortChange()">
+                            <option value="newest">⏱️ Newest First</option>
+                            <option value="oldest">⏳ Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Active filter chips preview -->
+            <div class="active-filters-bar" id="activeFiltersBar" style="display: none;">
+                <span class="filter-status-text" id="filterStatusText">Showing results...</span>
+                <button class="btn-link-reset" onclick="resetAllFilters()">Reset All Filters</button>
+            </div>
+        </section>
+
+        <!-- ==================== ITEMS LISTINGS GRID ==================== -->
+        <section class="items-section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="sectionHeading">Browse Listings</h2>
+                    <p class="section-subtitle" id="itemsCountSubtitle">Showing all available reports</p>
+                </div>
+                <div class="view-actions">
+                    <button class="btn btn-sm btn-outline" onclick="loadItems()" title="Refresh listings">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Items Container Grid -->
+            <div class="items-grid" id="itemsGrid">
+                <!-- Dynamically populated by script.js -->
+            </div>
+
+            <!-- Empty State Card (hidden by default) -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon-box">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                </div>
+                <h3 class="empty-title">No Items Found</h3>
+                <p class="empty-desc" id="emptyDesc">No lost or found items matched your current filter criteria.</p>
+                <div class="empty-actions">
+                    <button class="btn btn-outline" onclick="resetAllFilters()">Clear Filters</button>
+                    <button class="btn btn-primary" onclick="openReportModal('lost')">+ Report a Missing Item</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== MODAL: REPORT ITEM (ADD) ==================== -->
+    <div class="modal-overlay" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="reportModalTitle">Report an Item</h3>
+                    <p class="modal-subtitle">Submit details so the community can assist</p>
+                </div>
+                <button class="btn-close" onclick="closeModal('reportModal')" aria-label="Close modal">✕</button>
+            </div>
+
+            <form id="reportForm" onsubmit="handleReportSubmit(event)" enctype="multipart/form-data">
+                <div class="modal-body">
+
+                    <!-- Type Selector Switcher -->
+                    <div class="form-group">
+                        <label class="form-label">Report Type <span class="required">*</span></label>
+                        <div class="segmented-control">
+                            <label class="segment-option">
+                                <input type="radio" name="type" value="lost" id="typeRadioLost" checked onchange="updateFormTypeTheme('lost')">
+                                <span class="segment-pill segment-lost">
+                                    <span class="dot dot-red"></span> I Lost an Item
+                                </span>
+                            </label>
+                            <label class="segment-option">
+                                <input type="radio" name="type" value="found" id="typeRadioFound" onchange="updateFormTypeTheme('found')">
+                                <span class="segment-pill segment-found">
+                                    <span class="dot dot-green"></span> I Found an Item
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Item Title -->
+                    <div class="form-group">
+                        <label for="itemTitle" class="form-label">Item Title / Name <span class="required">*</span></label>
+                        <input type="text" id="itemTitle" name="title" required placeholder="e.g. Silver MacBook Air M2 in Black Sleeve" class="form-input">
+                    </div>
+
+                    <!-- Category & Date (2 columns) -->
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="itemCategory" class="form-label">Category <span class="required">*</span></label>
+                            <select id="itemCategory" name="category" required class="form-select">
+                                <option value="Electronics">📱 Electronics</option>
+                                <option value="Wallets & Bags">👛 Wallets & Bags</option>
+                                <option value="Keys & Cards">🔑 Keys & Cards</option>
+                                <option value="Documents">📄 Documents & IDs</option>
+                                <option value="Pets">🐶 Pets & Animals</option>
+                                <option value="Clothing">👕 Clothing & Shoes</option>
+                                <option value="Jewelry">💍 Jewelry & Watches</option>
+                                <option value="Other">📦 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="itemDate" class="form-label">Date Lost / Found <span class="required">*</span></label>
+                            <input type="date" id="itemDate" name="item_date" required class="form-input">
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label for="itemLocation" class="form-label">Location (Where was it lost/found?) <span class="required">*</span></label>
+                        <input type="text" id="itemLocation" name="location" required placeholder="e.g. Main Library 2nd Floor Study Desk" class="form-input">
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="itemDescription" class="form-label">Description & Unique Identifiers</label>
+                        <textarea id="itemDescription" name="description" rows="3" placeholder="Provide distinct features, color, brand, stickers, serial number, scratches, etc." class="form-textarea"></textarea>
+                    </div>
+
+                    <!-- Image Upload with Instant Live Preview -->
+                    <div class="form-group">
+                        <label class="form-label">Item Photo <span class="optional">(Recommended)</span></label>
+                        <div class="upload-dropzone" id="reportDropzone" onclick="document.getElementById('itemPhotoInput').click()">
+                            <input type="file" id="itemPhotoInput" name="photo" accept="image/*" style="display: none;" onchange="handleImagePreview(this, 'reportPreviewContainer', 'reportPreviewImg')">
+                            
+                            <!-- Default Upload UI -->
+                            <div class="upload-prompt" id="reportUploadPrompt">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <div class="upload-text">
+                                    <strong>Click or drag an image here</strong>
+                                    <span>Supports JPG, PNG, WEBP up to 16MB</span>
+                                </div>
+                            </div>
+
+                            <!-- Live Preview UI (Hidden initially) -->
+                            <div class="upload-preview-wrap" id="reportPreviewContainer" style="display: none;">
+                                <img src="" alt="Selected Preview" id="reportPreviewImg" class="preview-img">
+                                <button type="button" class="btn-remove-preview" onclick="removeImagePreview(event, 'itemPhotoInput', 'reportPreviewContainer', 'reportUploadPrompt')" title="Remove photo">✕ Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Details Header -->
+                    <div class="form-section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Your Contact Information
+                    </div>
+
+                    <!-- Contact Name & Phone -->
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="contactName" class="form-label">Contact Name <span class="required">*</span></label>
+                            <input type="text" id="contactName" name="contact_name" required placeholder="e.g. Alex Morgan" class="form-input">
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="contactPhone" class="form-label">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="contactPhone" name="contact_phone" required placeholder="e.g. +1 (555) 019-2834" class="form-input">
+                        </div>
+                    </div>
+
+                    <!-- Contact Email -->
+                    <div class="form-group">
+                        <label for="contactEmail" class="form-label">Email Address <span class="optional">(Optional)</span></label>
+                        <input type="email" id="contactEmail" name="contact_email" placeholder="e.g. alex.morgan@example.com" class="form-input">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('reportModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="reportSubmitBtn">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: ITEM DETAILS (VIEW) ==================== -->
+    <div class="modal-overlay" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailItemTitle">
+        <div class="modal-container modal-lg">
+            <div class="modal-header">
+                <div class="detail-header-tags">
+                    <span class="status-badge" id="detailStatusBadge">LOST</span>
+                    <span class="category-badge" id="detailCategoryBadge">Electronics</span>
+                </div>
+                <button class="btn-close" onclick="closeModal('detailModal')" aria-label="Close modal">✕</button>
+            </div>
+
+            <div class="modal-body detail-modal-body">
+                <!-- Large Item Photo -->
+                <div class="detail-image-box" id="detailImageBox">
+                    <img src="" alt="Item Photo" id="detailItemImg" class="detail-img">
+                </div>
+
+                <div class="detail-info-pane">
+                    <h2 class="detail-title" id="detailItemTitle">Item Title</h2>
+                    
+                    <div class="detail-meta-list">
+                        <div class="meta-item">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <div>
+                                <span class="meta-label">Date Recorded:</span>
+                                <strong id="detailItemDate">2026-10-24</strong>
+                            </div>
+                        </div>
+
+                        <div class="meta-item">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <div>
+                                <span class="meta-label">Location:</span>
+                                <strong id="detailItemLocation">Central Library</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description box -->
+                    <div class="detail-desc-box">
+                        <h4 class="detail-heading">Description</h4>
+                        <p class="detail-text" id="detailItemDescription">No detailed description provided.</p>
+                    </div>
+
+                    <!-- Contact Details Card -->
+                    <div class="contact-card">
+                        <h4 class="contact-card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            Contact Person
+                        </h4>
+                        <div class="contact-name" id="detailContactName">Alex Morgan</div>
+                        
+                        <div class="contact-actions-row">
+                            <a href="#" id="detailContactPhoneLink" class="contact-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                <span id="detailContactPhone">+1 555-0199</span>
+                            </a>
+                            <a href="#" id="detailContactEmailLink" class="contact-btn" style="display: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <span id="detailContactEmail">alex@example.com</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Action Controls for Item -->
+            <div class="modal-footer detail-modal-footer">
+                <div class="detail-actions-left">
+                    <button class="btn btn-outline-danger" id="detailDeleteBtn" onclick="confirmDeleteItem()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        Delete
+                    </button>
+                    <button class="btn btn-outline" id="detailEditBtn" onclick="openEditModalFromDetail()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit
+                    </button>
+                </div>
+                <div class="detail-actions-right">
+                    <button class="btn btn-success" id="detailClaimBtn" onclick="toggleClaimedStatusFromDetail()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        Mark as Claimed / Returned
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: EDIT ITEM ==================== -->
+    <div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="editModalTitle">Edit Item</h3>
+                    <p class="modal-subtitle">Update item records, status, or photo</p>
+                </div>
+                <button class="btn-close" onclick="closeModal('editModal')" aria-label="Close modal">✕</button>
+            </div>
+
+            <form id="editForm" onsubmit="handleEditSubmit(event)" enctype="multipart/form-data">
+                <input type="hidden" id="editItemId" name="id">
+
+                <div class="modal-body">
+                    <!-- Status Selector -->
+                    <div class="form-group">
+                        <label for="editStatus" class="form-label">Current Status <span class="required">*</span></label>
+                        <select id="editStatus" name="status" required class="form-select">
+                            <option value="lost">🔴 Lost (Missing)</option>
+                            <option value="found">🟢 Found (Awaiting Owner)</option>
+                            <option value="claimed">🟣 Claimed / Reunited</option>
+                            <option value="returned">🤝 Returned to Owner</option>
+                        </select>
+                    </div>
+
+                    <!-- Type -->
+                    <div class="form-group">
+                        <label for="editType" class="form-label">Listing Type <span class="required">*</span></label>
+                        <select id="editType" name="type" required class="form-select">
+                            <option value="lost">Lost Item Report</option>
+                            <option value="found">Found Item Report</option>
+                        </select>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="editTitle" class="form-label">Item Title <span class="required">*</span></label>
+                        <input type="text" id="editTitle" name="title" required class="form-input">
+                    </div>
+
+                    <!-- Category & Date -->
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="editCategory" class="form-label">Category <span class="required">*</span></label>
+                            <select id="editCategory" name="category" required class="form-select">
+                                <option value="Electronics">📱 Electronics</option>
+                                <option value="Wallets & Bags">👛 Wallets & Bags</option>
+                                <option value="Keys & Cards">🔑 Keys & Cards</option>
+                                <option value="Documents">📄 Documents & IDs</option>
+                                <option value="Pets">🐶 Pets & Animals</option>
+                                <option value="Clothing">👕 Clothing & Shoes</option>
+                                <option value="Jewelry">💍 Jewelry & Watches</option>
+                                <option value="Other">📦 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="editDate" class="form-label">Date <span class="required">*</span></label>
+                            <input type="date" id="editDate" name="item_date" required class="form-input">
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label for="editLocation" class="form-label">Location <span class="required">*</span></label>
+                        <input type="text" id="editLocation" name="location" required class="form-input">
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="editDescription" class="form-label">Description</label>
+                        <textarea id="editDescription" name="description" rows="3" class="form-textarea"></textarea>
+                    </div>
+
+                    <!-- Replace Photo Option -->
+                    <div class="form-group">
+                        <label class="form-label">Item Photo</label>
+                        <div class="upload-dropzone" id="editDropzone" onclick="document.getElementById('editPhotoInput').click()">
+                            <input type="file" id="editPhotoInput" name="photo" accept="image/*" style="display: none;" onchange="handleImagePreview(this, 'editPreviewContainer', 'editPreviewImg')">
+                            
+                            <div class="upload-prompt" id="editUploadPrompt">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <div class="upload-text">
+                                    <strong>Click to replace photo</strong>
+                                    <span>Leave empty to keep existing image</span>
+                                </div>
+                            </div>
+
+                            <div class="upload-preview-wrap" id="editPreviewContainer" style="display: none;">
+                                <img src="" alt="Selected Preview" id="editPreviewImg" class="preview-img">
+                                <button type="button" class="btn-remove-preview" onclick="removeImagePreview(event, 'editPhotoInput', 'editPreviewContainer', 'editUploadPrompt')" title="Remove photo">✕ Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div class="form-section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Contact Information
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="editContactName" class="form-label">Contact Name <span class="required">*</span></label>
+                            <input type="text" id="editContactName" name="contact_name" required class="form-input">
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="editContactPhone" class="form-label">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="editContactPhone" name="contact_phone" required class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editContactEmail" class="form-label">Email</label>
+                        <input type="email" id="editContactEmail" name="contact_email" class="form-input">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="editSubmitBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: DELETE CONFIRMATION ==================== -->
+    <div class="modal-overlay" id="deleteConfirmModal" role="dialog" aria-modal="true">
+        <div class="modal-container modal-sm">
+            <div class="modal-header">
+                <h3 class="modal-title text-danger">Delete Item?</h3>
+                <button class="btn-close" onclick="closeModal('deleteConfirmModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this listing? This action cannot be reversed.</p>
+                <div class="delete-item-preview" id="deleteItemPreview">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('deleteConfirmModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" id="executeDeleteBtn" onclick="executeDelete()">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: DATABASE CONFIG & INFO ==================== -->
+    <div class="modal-overlay" id="dbModal" role="dialog" aria-modal="true">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title">Database Configuration</h3>
+                    <p class="modal-subtitle">Seamless support for both SQLite and MySQL</p>
+                </div>
+                <button class="btn-close" onclick="closeModal('dbModal')">✕</button>
+            </div>
+            <div class="modal-body db-modal-body">
+                <div class="db-status-card" id="dbStatusDetails">
+                    <div class="db-badge-large">
+                        <span class="db-dot-lg"></span>
+                        <strong id="dbModalEngine">SQLite Active</strong>
+                    </div>
+                    <p class="db-desc" id="dbModalDesc">
+                        The app is currently using lightweight SQLite (zero setup required). All records are stored locally in <code>lost_and_found.db</code>.
+                    </p>
+                </div>
+
+                <div class="db-info-section">
+                    <h4>How to Switch to MySQL (Optional):</h4>
+                    <ol class="db-steps">
+                        <li>Start your MySQL server (via XAMPP, WampServer, or standalone MySQL).</li>
+                        <li>Create a database named <code>lost_and_found</code> in phpMyAdmin or MySQL client.</li>
+                        <li>In <code>app.py</code>, set <code>DB_TYPE = "mysql"</code> (or launch with <code>DB_TYPE=mysql python app.py</code>).</li>
+                        <li>Restart the app! It will automatically connect and create all tables for you.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('dbModal')">Understood</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TOAST NOTIFICATION POPUP ==================== -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <strong>Findr</strong> — Modern Lost & Found Web Application
+            </div>
+            <div class="footer-right">
+                Flat Architecture &bull; Python Flask &bull; SQLite &bull; MySQL Ready
+            </div>
+        </div>
+    </footer>
+
+    <!-- Frontend Application Logic -->
+    <script src="script.js"></script>
+</body>
+</html>
